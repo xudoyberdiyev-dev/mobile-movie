@@ -8,7 +8,7 @@
         const navigation =useNavigation()
         return(
         <View className='flex-1 bg-neutral-900'>
-        <ImageBackground source={require('../assets/backronimg.jpg')} className='flex-1'/>
+        <ImageBackground source={require('../../assets/backronimg.jpg')} className='flex-1'/>
         <LinearGradient colors={['rgba(18,18,18,0.8)','#121212']}
         start={{x:0,y:0}}
         end={{x:0,y:0.90}}
@@ -61,7 +61,7 @@
                  <Text className="absolute -top-2 bg-[#121212] px-3 text-gray-500">Or</Text>
             </View>
             <View className="flex-row justify-center items-center mt-5 bg-gray-800 rounded-[12px] h-[50px] cursor-pointer">
-                <Image source={require('../assets/images/google.png')} className="w-10 h-10 mx-2" />
+                <Image source={require('../../assets/images/google.png')} className='w-10 h-10 mx-2'/>
             </View>
            
             <View className="flex-row justify-center mt-10">

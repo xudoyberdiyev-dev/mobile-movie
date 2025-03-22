@@ -3,13 +3,12 @@ import { LinearGradient } from "expo-linear-gradient"
 import { useRef, useState } from "react";
 import { Alert, Image, ImageBackground, SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native"
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5"
-import { BASE_URL } from "../connection/BaseUrl";
-import { APP_API } from "../connection/AppApi";
+import { BASE_URL } from "../../connection/BaseUrl";
+import { APP_API } from "../../connection/AppApi";
 import Toast from "react-native-toast-message";
-import { EmailStep } from "./EmailStep";
-import { RegisterFrom } from "./RegisterFrom";
-import { OtpStep } from "./OtpStep";
-
+import { EmailStep } from "../../components/EmailStep";
+import { RegisterFrom } from "../../components/RegisterFrom";
+import {OtpStep} from '../../components/OtpStep'
 //improt
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
@@ -99,7 +98,7 @@ export const Register=({navigation})=>{
 
     return(
       <View className='flex-1 bg-neutral-900'>
-              <ImageBackground source={require('../assets/backronimg.jpg')} className='flex-1'/>
+        <ImageBackground source={require('../../assets/backronimg.jpg')} className='flex-1'/>
               <LinearGradient colors={['rgba(18,18,18,0.8)','#121212']}
               start={{x:0,y:0}}
               end={{x:0,y:0.90}}
