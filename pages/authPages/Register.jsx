@@ -1,149 +1,141 @@
 import axios from "axios";
-import { LinearGradient } from "expo-linear-gradient"
+import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useState } from "react";
-import { Alert, Image, ImageBackground, SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native"
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5"
+import { Alert, ImageBackground, SafeAreaView, View } from "react-native";
 import { BASE_URL } from "../../connection/BaseUrl";
 import { APP_API } from "../../connection/AppApi";
 import Toast from "react-native-toast-message";
 import { EmailStep } from "../../components/EmailStep";
 import { RegisterFrom } from "../../components/RegisterFrom";
-import {OtpStep} from '../../components/OtpStep'
-//improt
+import { OtpStep } from "../../components/OtpStep";
+import { validateEmail, validateOtp, validateRegister } from "../../utils/Validation";
+import { registerUser, sendToEmail, verifyEmail } from "../../connection/service/AuthService";
+import { handleChange, handleKeyPress } from "../../utils/Halpers";
 
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 const OTP_LENGTH = 6;
-export const Register=({navigation})=>{
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [password, setPassword] = useState("");
-  const [step, setStep] = useState(1);
-  const [error, setError] = useState("");
-  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
-  const inputRefs = useRef([]);
-  const [secureText, setSecureText] = useState(true); // Parol ko‘rinishi
 
+export const Register = ({ navigation }) => {
+    const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
+    const [surname, setSurname] = useState("");
+    const [password, setPassword] = useState("");
+    const [step, setStep] = useState(1);
+    const [error, setError] = useState("");
+    const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
+    const inputRefs = useRef([]);
+    const [secureText, setSecureText] = useState(true); // Parol ko‘rinishi
 
-  const validateEmail = (email) => {
-    if (!email.trim()) return "Iltimos, emailni kiriting";
-    if (!EMAIL_REGEX.test(email.trim())) return "Faqat @gmail.com emaili qabul qilinadi";
-    return "";
-  };
-
-  const validateRegister=(name,surname,password)=>{
-    if(!name.trim()) return "Ismingiz bo'sh qolib ketti"
-    if(!surname.trim()) return "Familyangiz bo'sh qolib ketti"
-    if(!password.trim()) return "Parol bo'sh qolib ketdi";
-    if(password.length < 6) return "Parol 6 ta belgidan ko'p bo'lsin"
-    return ""
-  }
-
-  const register =async()=>{
-    const errorMessage = validateRegister(name, surname, password);
-    if (errorMessage) { 
-        setError(errorMessage);
-        return;
-    }
-    setError("");  
-    const data = { name, surname, password };
-    try{
-      const res = await axios.post(`${BASE_URL}/auth/register`,data)
-      if(res.data.success){
-        navigation.navigate('Home')
-      }else{
-        Alert.alert("Royxatdan otishda xatolik")
-      }
-    }catch(error){
-      Alert.alert("Foydalanuvchi topilmadi")
-    }
-  }
-   
-    const sendToEmail = async () => {
-      const errorMessage = validateEmail(email);
-      if (errorMessage) {
-      setError(errorMessage);
-      return;
-      }
-      setError("");    
-      try {
-        const { data } = await axios.post(`${BASE_URL}/auth/send-to`, null, {
-          params: { email },
-        });
-  
-        if (data.success) {
-          setStep(2);
-        } else {
-          Alert.alert("Xatolik", data.message);
+    const register = async () => {
+        const errorMessage = validateRegister(name, surname, password);
+        if (errorMessage) {
+            setError(errorMessage);
+            return;
         }
-      } catch (error) {
-        const message =
-          error.response?.data?.message || "Internet bilan bog‘liq muammo yoki server ishlamayapti";
-        Alert.alert("Xatolik", `Kod: ${error.response?.status || "Noma'lum"}, ${message}`);
-      }
-  }
-     const verifyEmail = async () => {
-        const code = otp.join(""); // 6 xonali kodni birlashtirish
-        if(!code){
-          setError("Iltimos kodni kiriting")
-          return
-        }
-        if (code.length !== 6) {
-          setError("Kod xato iltimos to'liq kodni kiriting")
-          return;
-        }
-    
+        setError("");
+
         try {
-          const response = await axios.post(
-            `${BASE_URL}/auth/verify`,
-            null,
-            { params: { code, email } }
-          );
-    
-          if (response.data.success) {
-            setStep(3) // Muvaffaqiyatli tasdiqlashdan keyin Home sahifaga yo‘naltirish
-          } else {
-            setError("kod xato qayta uruning")
-          }
+            const res = await registerUser(name, surname, password);
+            if (res.success) {
+                navigation.navigate("Home");
+            } else {
+                Alert.alert("Ro'yxatdan o'tishda xatolik");
+            }
         } catch (error) {
-          setError('kod xato qayta urining');
+            Alert.alert(error.message);
         }
-      };
+    };
 
-      const handleChange = (text, index) => {
-        if (text.length > 1) return; // Faqat 1 ta belgi kiritish mumkin
-        const newOtp = [...otp];
-        newOtp[index] = text;
-        setOtp(newOtp);
-  
-        if (text && index < inputRefs.current.length - 1) {
-           inputRefs.current[index + 1].focus(); // Keyingi katakka o'tish
+    const sendEmail = async () => {
+        const errorMessage = validateEmail(email);
+        if (errorMessage) {
+            setError(errorMessage);
+            return;
         }
-     };
-  
-     const handleKeyPress = (e, index) => {
-        if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-           inputRefs.current[index - 1].focus(); // Oldingi katakka o'tish
+        setError("");
+
+        try {
+            const data = await sendToEmail(email);
+            if (data.success) {
+                setStep(2);
+            } else {
+                Alert.alert("Xatolik", data.message);
+            }
+        } catch (error) {
+            Alert.alert("Xatolik", error.message);
         }
-     };
+    };
 
-    return(
-      <View className='flex-1 bg-neutral-900'>
-        <ImageBackground source={require('../../assets/backronimg.jpg')} className='flex-1'/>
-              <LinearGradient colors={['rgba(18,18,18,0.8)','#121212']}
-              start={{x:0,y:0}}
-              end={{x:0,y:0.90}}
-              locations={[0,0.65]}
-              className='top-0 absolute left-0 right-0 bottom-0'
-              />
-                <SafeAreaView className="flex-1 absolute p-5 w-full">
-                  {step==3&&<EmailStep email={email} setEmail={setEmail} error={error} sendToEmail={sendToEmail} navigation={navigation}/>}
-                  {step==1&&<RegisterFrom name={name} surname={surname} password={password} setName={setName} setSurname={setSurname} setPassword={setPassword} secureText={secureText} setSecureText={setSecureText} error={error} register={register} navigation={navigation}/>}
-                </SafeAreaView>
-                <SafeAreaView className="absolute top-[200px]  p-5 w-full ">
-                  {step==2&&<OtpStep otp={otp} inputRefs={inputRefs} error={error} handleChange={handleChange} handleKeyPress={handleKeyPress} verifyEmail={verifyEmail}/>}
-                </SafeAreaView>      
-      </View>
-    )
-}
+    const verifyOtp = async () => {
+        const code = otp.join("");
+        const errorMessage = validateOtp(code);
+        if (errorMessage) {
+            setError(errorMessage);
+            return;
+        }
+        setError("");
 
+        try {
+            const data = await verifyEmail(email, code);
+            if (data.success) {
+                setStep(3);
+            } else {
+                setError("Kod noto‘g‘ri, qayta urinib ko‘ring");
+            }
+        } catch (error) {
+            setError(error.message);
+        }
+    };
+
+    return (
+        <View className='flex-1 bg-neutral-900'>
+            <ImageBackground source={require('../../assets/backronimg.jpg')} className='flex-1' />
+            <LinearGradient 
+                colors={['rgba(18,18,18,0.8)', '#121212']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 0.90 }}
+                locations={[0, 0.65]}
+                className='top-0 absolute left-0 right-0 bottom-0'
+            />
+            
+            <SafeAreaView className="flex-1 absolute p-5 w-full">
+                {step == 1 && (
+                    <EmailStep 
+                        email={email} 
+                        setEmail={setEmail} 
+                        error={error} 
+                        sendEmail={sendEmail} 
+                        navigation={navigation} 
+                    />
+                )}
+                {step == 3 && (
+                    <RegisterFrom 
+                        name={name} 
+                        surname={surname} 
+                        password={password} 
+                        setName={setName} 
+                        setSurname={setSurname} 
+                        setPassword={setPassword} 
+                        secureText={secureText} 
+                        setSecureText={setSecureText} 
+                        error={error} 
+                        register={register} 
+                        navigation={navigation} 
+                    />
+                )}
+            </SafeAreaView>
+            
+            <SafeAreaView className="absolute top-[200px] p-5 w-full">
+                {step == 2 && (
+                    <OtpStep 
+                        otp={otp} 
+                        inputRefs={inputRefs} 
+                        error={error} 
+                        handleChange={(text, index) => handleChange(text, index, otp, setOtp, inputRefs)} 
+                        handleKeyPress={(e, index) => handleKeyPress(e, index, otp, inputRefs)} 
+                        verifyOtp={verifyOtp} 
+                    />
+                )}
+            </SafeAreaView>
+        </View>
+    );
+};

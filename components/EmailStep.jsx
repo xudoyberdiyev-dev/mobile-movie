@@ -1,7 +1,7 @@
 import {Text, TextInput, TouchableOpacity, View } from "react-native"
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5"
 
-export const EmailStep =({email,setEmail,error,sendToEmail,navigation})=>{
+export const EmailStep =({email,setEmail,error,sendEmail,navigation})=>{
     return(
         <View className="flex-1 p-8 w-full mt-[70px]">
                         {/* Title */}
@@ -31,7 +31,7 @@ export const EmailStep =({email,setEmail,error,sendToEmail,navigation})=>{
                         </TouchableOpacity>
                 
                         {/* Social Login Buttons */}
-                        <TouchableOpacity onPress={sendToEmail}>
+                        <TouchableOpacity onPress={sendEmail}>
                         <View className="flex-row justify-center items-center mt-8 bg-red-600  rounded-[12px] h-[50px] ">
                           <Text className='text-white text-xl'>Kodni Olish</Text>
                             {/* <Image source={require('../assets/images/google.png')} className="w-10 h-10 mx-2" /> */}

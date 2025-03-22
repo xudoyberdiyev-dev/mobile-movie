@@ -1,6 +1,6 @@
 import {Text, TextInput, TouchableOpacity, View } from "react-native"
 
-export const OtpStep =({otp,error, inputRefs, handleChange, handleKeyPress, verifyEmail})=>{
+export const OtpStep =({otp,error, inputRefs, handleChange, handleKeyPress, verifyOtp})=>{
     return(
         <View className="w-full max-w-sm bg-transparent">
                           <Text className="text-white text-xl font-bold text-center">
@@ -29,7 +29,7 @@ export const OtpStep =({otp,error, inputRefs, handleChange, handleKeyPress, veri
                             {error ? <Text className="text-red-500">{error}</Text> : null}
                         </View>                     
                           {/* Submit Button */}
-                          <TouchableOpacity  onPress={verifyEmail}
+                          <TouchableOpacity  onPress={verifyOtp}
                               className="mt-7 bg-red-600  py-3 rounded-lg self-center w-full max-w-xs"
                           >
                               <Text className="text-white text-center text-lg font-semibold">
