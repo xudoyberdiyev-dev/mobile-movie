@@ -53,8 +53,35 @@ export const Register=({navigation})=>{
         Alert.alert("Xatolik", `Kod: ${error.response?.status || "Noma'lum"}, ${message}`);
       }
   }
+     const verifyEmail = async () => {
+        const code = otp.join(""); // 6 xonali kodni birlashtirish
+        if(!code){
+          setError("Iltimos kodni kiriting")
+          return
+        }
+        if (code.length !== 6) {
+          setError("Kod xato iltimos to'liq kodni kiriting")
+          return;
+        }
     
-    const handleChange = (text, index) => {
+        try {
+          const response = await axios.post(
+            `${BASE_URL}/auth/verify`,
+            null,
+            { params: { code, email } }
+          );
+    
+          if (response.data.success) {
+            setStep(3) // Muvaffaqiyatli tasdiqlashdan keyin Home sahifaga yo‘naltirish
+          } else {
+            setError("kod xato qayta uruning")
+          }
+        } catch (error) {
+          setError('kod xato qayta urining');
+        }
+      };
+
+      const handleChange = (text, index) => {
         if (text.length > 1) return; // Faqat 1 ta belgi kiritish mumkin
         const newOtp = [...otp];
         newOtp[index] = text;
@@ -70,31 +97,6 @@ export const Register=({navigation})=>{
            inputRefs.current[index - 1].focus(); // Oldingi katakka o'tish
         }
      };
-     const verifyEmail = async () => {
-        const code = otp.join(""); // 6 xonali kodni birlashtirish
-        if (code.length !== 6) {
-          Alert.alert("Xatolik", "Iltimos, to‘liq kodni kiriting.");
-          return;
-        }
-    
-        try {
-          const response = await axios.post(
-            `${BASE_URL}/auth/verify`,
-            null,
-            { params: { code, email } }
-          );
-    
-          if (response.data.success) {
-            Alert.alert("Muvaffaqiyat!", "Email tasdiqlandi!");
-            setStep(3) // Muvaffaqiyatli tasdiqlashdan keyin Home sahifaga yo‘naltirish
-          } else {
-            Alert.alert("Xatolik", response.data.message);
-          }
-        } catch (error) {
-          Alert.alert("Xatolik", "Server bilan bog‘lanishda muammo yuz berdi.");
-        }
-      };
-  
 
     return(
       <View className='flex-1 bg-neutral-900'>
@@ -110,7 +112,7 @@ export const Register=({navigation})=>{
                   {step==3&&<RegisterFrom email={email} setEmail={setEmail} error={error} sendToEmail={sendToEmail} navigation={navigation}/>}
                 </SafeAreaView>
                 <SafeAreaView className="absolute top-[200px]  p-5 w-full ">
-                  {step==2&&<OtpStep otp={otp} inputRefs={inputRefs} handleChange={handleChange} handleKeyPress={handleKeyPress} verifyEmail={verifyEmail}/>}
+                  {step==2&&<OtpStep otp={otp} inputRefs={inputRefs} error={error} handleChange={handleChange} handleKeyPress={handleKeyPress} verifyEmail={verifyEmail}/>}
                 </SafeAreaView>      
       </View>
     )
