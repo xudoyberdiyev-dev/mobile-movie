@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BASE_URL } from "../BaseUrl";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const registerUser = async (name, surname, password) => {
     try {
@@ -24,5 +25,20 @@ export const verifyEmail = async (email, code) => {
         return data;
     } catch (error) {
         throw new Error("Kod noto‘g‘ri, qayta urinib ko‘ring");
+    }
+};
+
+export const loginUser = async (email, password) => {
+    try {
+        const { data } = await axios.post(`${BASE_URL}/auth/login`, { user: { email, password } });
+        console.log("🔵 Backend javobi:", data); // Qo'shimcha log
+
+        if (data?.token) {
+            await AsyncStorage.setItem("authToken", data.token); // Tokenni saqlash
+        }
+        return data;
+    } catch (error) {
+        console.error("🔴 Axios xatolik:", error.response?.data);
+        throw new Error(error.response?.data?.message || "EMail yoki parol noto‘g‘ri");
     }
 };

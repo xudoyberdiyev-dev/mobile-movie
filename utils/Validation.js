@@ -19,3 +19,9 @@ export const validateOtp =(code)=>{
     if(code.length!==6) return "Kod xato iltimos kodni to'lliq kiriting"
     return "";
 }
+
+export const validateLogin=(email,password)=>{
+    if(!email.trim()) return "Iltimos emailni kiriting"
+    if(!password.trim()) return "Iltimos passwordni kiritng"
+    return ""
+}
