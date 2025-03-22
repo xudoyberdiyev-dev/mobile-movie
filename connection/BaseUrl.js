@@ -1,0 +1,1 @@
+export const BASE_URL='https://animelinebackend-production.up.railway.app/v1/api'
