@@ -29,6 +29,34 @@ export const Register=({navigation})=>{
     if (!EMAIL_REGEX.test(email.trim())) return "Faqat @gmail.com emaili qabul qilinadi";
     return "";
   };
+
+  const validateRegister=(name,surname,password)=>{
+    if(!name.trim()) return "Ismingiz bo'sh qolib ketti"
+    if(!surname.trim()) return "Familyangiz bo'sh qolib ketti"
+    if(!password.trim()) return "Parol bo'sh qolib ketdi";
+    if(password.length < 6) return "Parol 6 ta belgidan ko'p bo'lsin"
+    return ""
+  }
+
+  const register =async()=>{
+    const errorMessage = validateRegister(name, surname, password);
+    if (errorMessage) { 
+        setError(errorMessage);
+        return;
+    }
+    setError("");  
+    const data = { name, surname, password };
+    try{
+      const res = await axios.post(`${BASE_URL}/auth/register`,data)
+      if(res.data.success){
+        navigation.navigate('Home')
+      }else{
+        Alert.alert("Royxatdan otishda xatolik")
+      }
+    }catch(error){
+      Alert.alert("Foydalanuvchi topilmadi")
+    }
+  }
    
     const sendToEmail = async () => {
       const errorMessage = validateEmail(email);
@@ -108,8 +136,8 @@ export const Register=({navigation})=>{
               className='top-0 absolute left-0 right-0 bottom-0'
               />
                 <SafeAreaView className="flex-1 absolute p-5 w-full">
-                  {step==1&&<EmailStep email={email} setEmail={setEmail} error={error} sendToEmail={sendToEmail} navigation={navigation}/>}
-                  {step==3&&<RegisterFrom email={email} setEmail={setEmail} error={error} sendToEmail={sendToEmail} navigation={navigation}/>}
+                  {step==3&&<EmailStep email={email} setEmail={setEmail} error={error} sendToEmail={sendToEmail} navigation={navigation}/>}
+                  {step==1&&<RegisterFrom name={name} surname={surname} password={password} setName={setName} setSurname={setSurname} setPassword={setPassword} error={error} register={register} navigation={navigation}/>}
                 </SafeAreaView>
                 <SafeAreaView className="absolute top-[200px]  p-5 w-full ">
                   {step==2&&<OtpStep otp={otp} inputRefs={inputRefs} error={error} handleChange={handleChange} handleKeyPress={handleKeyPress} verifyEmail={verifyEmail}/>}
