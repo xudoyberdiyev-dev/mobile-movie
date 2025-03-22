@@ -22,6 +22,7 @@ export const Register=({navigation})=>{
   const [error, setError] = useState("");
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
   const inputRefs = useRef([]);
+  const [secureText, setSecureText] = useState(true); // Parol ko‘rinishi
 
 
   const validateEmail = (email) => {
@@ -137,7 +138,7 @@ export const Register=({navigation})=>{
               />
                 <SafeAreaView className="flex-1 absolute p-5 w-full">
                   {step==3&&<EmailStep email={email} setEmail={setEmail} error={error} sendToEmail={sendToEmail} navigation={navigation}/>}
-                  {step==1&&<RegisterFrom name={name} surname={surname} password={password} setName={setName} setSurname={setSurname} setPassword={setPassword} error={error} register={register} navigation={navigation}/>}
+                  {step==1&&<RegisterFrom name={name} surname={surname} password={password} setName={setName} setSurname={setSurname} setPassword={setPassword} secureText={secureText} setSecureText={setSecureText} error={error} register={register} navigation={navigation}/>}
                 </SafeAreaView>
                 <SafeAreaView className="absolute top-[200px]  p-5 w-full ">
                   {step==2&&<OtpStep otp={otp} inputRefs={inputRefs} error={error} handleChange={handleChange} handleKeyPress={handleKeyPress} verifyEmail={verifyEmail}/>}
