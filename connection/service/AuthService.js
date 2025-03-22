@@ -1,3 +1,4 @@
+import axios from "axios";
 import { BASE_URL } from "../BaseUrl";
 
 export const registerUser = async (name, surname, password) => {
@@ -10,7 +11,7 @@ export const registerUser = async (name, surname, password) => {
 };
 export const sendToEmail = async (email) => {
     try {
-        const { data } = await axios.post(`${BASE_URL}/auth/send-to`, null, { params: { email } });
+        const  {data}  = await axios.post(`${BASE_URL}/auth/send-to`, null, { params: { email } });
         return data;
     } catch (error) {
         throw new Error(error.response?.data?.message || "Internet yoki server muammosi");

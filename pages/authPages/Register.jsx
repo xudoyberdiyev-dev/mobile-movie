@@ -133,6 +133,7 @@ export const Register = ({ navigation }) => {
                         handleChange={(text, index) => handleChange(text, index, otp, setOtp, inputRefs)} 
                         handleKeyPress={(e, index) => handleKeyPress(e, index, otp, inputRefs)} 
                         verifyOtp={verifyOtp} 
+                        navigation={navigation}
                     />
                 )}
             </SafeAreaView>

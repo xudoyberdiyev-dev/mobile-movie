@@ -4,7 +4,9 @@ import AuthStack from '../utils/AuthStack'
 
 const Profile = () => {
   return (
-   <AuthStack/>
+    <View>
+      <Text>Tejsldkg </Text>
+    </View>
   )
 }
 
