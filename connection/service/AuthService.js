@@ -31,10 +31,10 @@ export const verifyEmail = async (email, code) => {
 export const loginUser = async (email, password) => {
     try {
         const { data } = await axios.post(`${BASE_URL}/auth/login`, { user: { email, password } });
-        console.log("🔵 Backend javobi:", data); // Qo'shimcha log
 
         if (data?.token) {
             await AsyncStorage.setItem("authToken", data.token); // Tokenni saqlash
+            await AsyncStorage.setItem("user", JSON.stringify(data.user)); // User ma’lumotlarini saqlash
         }
         return data;
     } catch (error) {
