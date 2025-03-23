@@ -5,6 +5,7 @@ import { validateLogin } from '../../utils/Validation';
 import { loginUser } from '../../connection/service/AuthService';
 import { LoginFrom } from '../../components/LoginFrom';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 export const Login = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -26,9 +27,11 @@ export const Login = ({ navigation }) => {
             if (!data || !data.user) {
                 throw new Error("Foydalanuvchi ma'lumotlari topilmadi!");
             }
-    
-            Alert.alert("Muvaffaqiyatli", `Xush kelibsiz, ${data.user.name}!`);
-    
+            Toast.show({
+                type:'success',
+                text1:'Xush Kelibsiz',
+                text2:`${data.user.name}`
+            })    
             await AsyncStorage.setItem("user", JSON.stringify(data.user));
             const testUser = await AsyncStorage.getItem("user");
     
@@ -38,7 +41,7 @@ export const Login = ({ navigation }) => {
             });
         } catch (error) {
             console.error("🔴 Xatolik:", error);
-            Alert.alert("Xatolik", error.message || "Noma'lum xatolik yuz berdi");
+            Toast.show({type:"error",text1:'Xatolik',text2:"Keyinroq qayta uruning"})
         }
     };
     
@@ -62,9 +65,9 @@ export const Login = ({ navigation }) => {
     
             <KeyboardAvoidingView 
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-                className='flex-1 absolute w-full'
+                className='flex-1 bg-transparent  w-full'
             >
-                <SafeAreaView className="flex-1 bg-transparent p-5 w-full">
+                <SafeAreaView className="flex-1 absolute  p-5 w-full">
                     <LoginFrom
                         email={email}
                         setEmail={setEmail}

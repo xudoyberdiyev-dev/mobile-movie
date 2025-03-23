@@ -57,6 +57,7 @@ export const Register = ({ navigation }) => {
             const data = await sendToEmail(email);
             if (data.success) {
                 setStep(2);
+                Toast.show({type:"success",text1:'Xabar yuborildi',text2:"Emailingizga kod yubordik"})
             } else {
                 Alert.alert("Xatolik", data.message);
             }
