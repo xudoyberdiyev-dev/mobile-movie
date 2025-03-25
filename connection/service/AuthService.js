@@ -4,7 +4,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { Alert } from "react-native";
 import { APP_API } from "../AppApi";
-import { cache } from "react";
 
 export const sendToEmail = async (email) => {
     try {
@@ -123,24 +122,17 @@ export const sendVerifyEmail = async (email) => {
   };
 
 
-export const getUser = async (userId, token, setUserData, setLoading) => {
-    setLoading(true);
-    try {
-        const response = await axios.get(`${BASE_URL}/get-user-data/${userId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
 
-        setUserData(response.data);
-    } catch (error) {
-        if (error.response) {
-            if (error.response.status === 401) {
-                Alert.alert("Xatolik", "Avtorizatsiya muvaffaqiyatsiz!");
-            } else {
-                Alert.alert("Xatolik", `Xatolik kodi: ${error.response.status}`);
-            }
-        } else {
-            Alert.alert("Xatolik", "Maʼlumotni olishda muammo yuz berdi");
+export const getUser=async(userId)=>{
+    try{
+        const token =await AsyncStorage.getItem('authToken')
+        if (!token) {
+            console.log("token topilmadi");   
         }
+        const {data} =await axios.get(`${BASE_URL}${APP_API.getUserData}/${userId}`,{headers:{ Authorization: `Bearer ${token}`,}})
+        return data;
+    }catch(error){
+        console.log('getUserData xatosi:', error.message);
+    return null;
     }
-    setLoading(false);
-};
+}
