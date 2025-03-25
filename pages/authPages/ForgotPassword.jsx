@@ -62,7 +62,7 @@ const ForgotPassword = ({navigation}) => {
     setError('');
 
     try {
-      const data = await sendVerifyPassword(email, code);
+      const data = await sendVerifyPassword(code, email);
       if (data.success) {
         setStep(3);
       } else {
