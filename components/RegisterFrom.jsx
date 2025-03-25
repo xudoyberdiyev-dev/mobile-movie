@@ -4,8 +4,8 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 export const RegisterFrom = ({
   name,
   setName,
-  surname,
-  setSurname,
+  lastName,
+  setLastName,
   password,
   setPassword,
   secureText,
@@ -45,8 +45,8 @@ export const RegisterFrom = ({
           className="flex-1 px-2 text-[16px] text-white"
           placeholder="Surname"
           placeholderTextColor="gray"
-          value={surname}
-          onChangeText={(text) => setSurname(text)}
+          value={lastName}
+          onChangeText={(text) => setLastName(text)}
         />
       </View>
       <View className="min-h-[20px]">

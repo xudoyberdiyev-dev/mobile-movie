@@ -17,7 +17,7 @@ const OTP_LENGTH = 6;
 export const Register = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
-    const [surname, setSurname] = useState("");
+    const [lastName, setLastName] = useState("");
     const [password, setPassword] = useState("");
     const [step, setStep] = useState(1);
     const [error, setError] = useState("");
@@ -25,26 +25,14 @@ export const Register = ({ navigation }) => {
     const inputRefs = useRef([]);
     const [secureText, setSecureText] = useState(true); // Parol ko‘rinishi
 
-    const register = async () => {
-        const errorMessage = validateRegister(name, surname, password);
-        if (errorMessage) {
-            setError(errorMessage);
-            return;
+    const register =async()=>{
+        const data ={name,surname,password}
+        try{
+            await registerUser(data,navigation)
+        }catch(error){
+            console.log("Registerda xatolik"+error)
         }
-        setError("");
-
-        try {
-            const res = await registerUser(name, surname, password);
-            if (res.success) {
-                navigation.navigate("Home");
-            } else {
-                Alert.alert("Ro'yxatdan o'tishda xatolik");
-            }
-        } catch (error) {
-            Alert.alert(error.message);
-        }
-    };
-
+    }
     const sendEmail = async () => {
         const errorMessage = validateEmail(email);
         if (errorMessage) {
@@ -111,10 +99,10 @@ export const Register = ({ navigation }) => {
                 {step == 3 && (
                     <RegisterFrom 
                         name={name} 
-                        surname={surname} 
+                        lastName={lastName} 
                         password={password} 
                         setName={setName} 
-                        setSurname={setSurname} 
+                        setLastName={setLastName} 
                         setPassword={setPassword} 
                         secureText={secureText} 
                         setSecureText={setSecureText} 
