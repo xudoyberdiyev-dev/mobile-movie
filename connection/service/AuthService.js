@@ -69,39 +69,58 @@ export const loginUser = async (email, password) => {
     }
 };
 
-export const sendVerifyEmail=async(email)=>{
-    try{
-        const {data}= await axios.post(`${BASE_URL}${APP_API.verifyEmail}`,null,{params:{email}})
-        if(data.success){
-            await AsyncStorage.setItem("reset_email",email) //email AsyncStorage saqlandi 
-        }
+export const sendVerifyEmail = async (email) => {
+    try {
+      const { data } = await axios.post(`${BASE_URL}${APP_API.verifyEmail}`, null, { params: { email } });
+  
+      if (data.success) {
+        await AsyncStorage.setItem("reset_email", email); // Email AsyncStorage saqlandi 
         return data;
-    }catch(error){
-        console.log("Veifiy email"+error)
+      }
+  
+      throw new Error(data?.message || "Email tasdiqlashda xatolik yuz berdi");
+    } catch (error) {
+      console.error("Verify email error:", error.response?.data?.message || error.message);
+      Toast.show({ type: 'error', text1: 'Email tasdiqlanmadi', text2: error.response?.data?.message || "Xatolik yuz berdi" });
+      return null;
     }
-}
-
-export const sendVerifyPassword =async(code,email)=>{
-    try{
-        const {data} =await axios.post(`${BASE_URL}${APP_API.verifyCode}`,null,{params:{code,email}})
-        if (data.success) {
-            await AsyncStorage.setItem('user_id',data.message)
-        }
+  };
+  
+  /** Kodni tasdiqlash */
+  export const sendVerifyPassword = async (code, email) => {
+    try {
+      const { data } = await axios.post(`${BASE_URL}${APP_API.verifyCode}`, null, { params: { code, email } });
+  
+      if (data.success) {
+        await AsyncStorage.setItem('user_id', data.message);
         return data;
-    }catch(error){
-        console.log(error)   
+      }
+  
+      throw new Error(data?.message || "Kod noto‘g‘ri");
+    } catch (error) {
+      console.error("Verify password error:", error.response?.data?.message || error.message);
+      Toast.show({ type: 'error', text1: 'Kod noto‘g‘ri', text2: error.response?.data?.message || "Qayta urinib ko‘ring" });
+      return null;
     }
-}
-
-export const sendResetPassword=async(password)=>{
-    try{
-        const userId =await AsyncStorage.getItem('user_id')
-        const {data} =await axios.post(`${BASE_URL}${APP_API.resetPassword}/${userId}`,null,{params:{password}})
-        return data;
-    }catch(error){
-        console.log("reset password error"+error);
+  };
+  
+  /** Parolni qayta tiklash */
+  export const sendResetPassword = async (password) => {
+    try {
+      const userId = await AsyncStorage.getItem('user_id');
+      if (!userId) throw new Error("User ID topilmadi");
+  
+      const { data } = await axios.post(`${BASE_URL}${APP_API.resetPassword}/${userId}`, null, { params: { password } });
+  
+      if (data.success) return data;
+      
+      throw new Error(data?.message || "Parolni tiklashda xatolik yuz berdi");
+    } catch (error) {
+      console.error("Reset password error:", error.response?.data?.message || error.message);
+      Toast.show({ type: 'error', text1: 'Parol o‘zgartirilmadi', text2: error.response?.data?.message || "Qayta urinib ko‘ring" });
+      return null;
     }
-}
+  };
 
 
 export const getUser = async (userId, token, setUserData, setLoading) => {

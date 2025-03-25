@@ -13,16 +13,17 @@ import { handleChange, handleKeyPress } from '../../utils/Halpers';
 
 const OTP_LENGTH = 6;
 
-const ForgotPassword = ({navigation}) => {
+const ForgotPassword = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(''));
-  const [password,setPassword]=useState('')
-  const [prePassword,setPrePassword]=useState('')
+  const [password, setPassword] = useState('');
+  const [prePassword, setPrePassword] = useState('');
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
   const inputRefs = useRef([]);
   const [secureText, setSecureText] = useState(true);
 
+  /** Emailni tasdiqlash funksiyasi */
   const verifyEmail = async () => {
     const errorMessage = validateEmail(email);
     if (errorMessage) {
@@ -33,25 +34,18 @@ const ForgotPassword = ({navigation}) => {
 
     try {
       const res = await sendVerifyEmail(email);
-      if (res.success) {
-        Toast.show({
-          type: 'success',
-          text1: 'Qabul qilindi',
-          text2: 'Kiritgan emailingizga kod yubordik',
-        });
+      if (res?.success) {
+        Toast.show({ type: 'success', text1: 'Qabul qilindi', text2: 'Kiritgan emailingizga kod yubordik' });
         setStep(2);
       } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Xatolik',
-          text2: 'Nimadr xato keti qayta uruning',
-        });
+        Toast.show({ type: 'error', text1: 'Xatolik', text2: res?.message || 'Nimadr xato keti qayta uruning' });
       }
     } catch (error) {
-      console.log('Xatolik: ' + error.message);
+      Toast.show({ type: 'error', text1: 'Xatolik', text2: 'Server bilan aloqa qilishda muammo' });
     }
   };
 
+  /** OTP kodini tekshirish funksiyasi */
   const verifyPassword = async () => {
     const code = otp.join('');
     const errorMessage = validateOtp(code);
@@ -63,33 +57,37 @@ const ForgotPassword = ({navigation}) => {
 
     try {
       const data = await sendVerifyPassword(code, email);
-      if (data.success) {
+      if (data?.success) {
         setStep(3);
       } else {
-        setError("Kod noto‘g‘ri, qayta urinib ko‘ring");
+        setError(data?.message || "Kod noto‘g‘ri, qayta urinib ko‘ring");
       }
     } catch (error) {
-      setError(error.message);
+      setError("Server bilan aloqa qilishda xatolik yuz berdi");
     }
   };
 
-  const resetPassword =async ()=>{
-    const errorMessage = validatePassword(password,prePassword);
+  /** Parolni tiklash funksiyasi */
+  const resetPassword = async () => {
+    const errorMessage = validatePassword(password, prePassword);
     if (errorMessage) {
       setError(errorMessage);
       return;
     }
     setError('');
-    try{
-     const {data} =  await sendResetPassword(password)
-     if(data.success){
-      Toast.show({ type: 'success', text1: 'Parol o‘zgartirildi' });
-      navigation.navigate('Login'); 
-     }
-    }catch(error){
-      console.log(error);
+
+    try {
+      const data = await sendResetPassword(password);
+      if (data?.success) {
+        Toast.show({ type: 'success', text1: 'Parol o‘zgartirildi' });
+        navigation.navigate('Login');
+      } else {
+        setError(data?.message || "Parolni o‘zgartirishda xatolik yuz berdi");
+      }
+    } catch (error) {
+      setError("Server bilan aloqa qilishda xatolik yuz berdi");
     }
-  }
+  };
 
   return (
     <View className="flex-1 bg-neutral-900">
@@ -104,6 +102,20 @@ const ForgotPassword = ({navigation}) => {
 
       <SafeAreaView className="flex-1 absolute p-5 w-full">
         {step === 1 && <ForgotEmail email={email} setEmail={setEmail} error={error} verifyEmail={verifyEmail} />}
+        {step === 3 && (
+          <NewPassword
+            password={password}
+            setPassword={setPassword}
+            prePassword={prePassword}
+            setPrePassword={setPrePassword}
+            secureText={secureText}
+            setSecureText={setSecureText}
+            resetPassword={resetPassword}
+          />
+        )}
+      </SafeAreaView>
+
+      <SafeAreaView className="absolute top-[150px] p-5 w-full">
         {step === 2 && (
           <OtpForgot
             otp={otp}
@@ -115,7 +127,6 @@ const ForgotPassword = ({navigation}) => {
             navigation={navigation}
           />
         )}
-        {step === 3 && <NewPassword />}
       </SafeAreaView>
     </View>
   );

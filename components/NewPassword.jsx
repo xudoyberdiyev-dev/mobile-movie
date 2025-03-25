@@ -1,17 +1,7 @@
 import React from 'react'
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-const NewPassword = ({ name,
-    setName,
-    lastName,
-    setLastName,
-    password,
-    setPassword,
-    secureText,
-    setSecureText,
-    error,
-    register,
-    navigation,}) => {
+const NewPassword = ({password,setPassword,prePassword,setPrePassword,resetPassword,secureText,setSecureText}) => {
   return (
     <View className="flex-1 p-8 w-full mt-[45px]">
          {/* Title */}
@@ -21,39 +11,6 @@ const NewPassword = ({ name,
          </Text>
    
          {/* Email Input */}
-         <View className="flex-row items-center border-b border-gray-400 w-full px-2 py-2">
-           <FontAwesome5Icon name="user" size={24} color="white" />
-           <TextInput
-             className="flex-1 px-2 text-[16px] text-white"
-             placeholder="Name"
-             placeholderTextColor="gray"
-             value={name}
-             onChangeText={(text) => setName(text)}
-           />
-         </View>
-         <View className="min-h-[20px]">
-           {error.includes("Ismingiz") && (
-             <Text className="text-red-500">{error}</Text>
-           )}
-         </View>
-   
-         <View className="flex-row items-center border-b border-gray-400 w-full px-2 py-2">
-           <FontAwesome5Icon name="user" size={24} color="white" />
-           <TextInput
-             className="flex-1 px-2 text-[16px] text-white"
-             placeholder="Surname"
-             placeholderTextColor="gray"
-             value={lastName}
-             onChangeText={(text) => setLastName(text)}
-           />
-         </View>
-         <View className="min-h-[20px]">
-           {error.includes("Familyangiz") && (
-             <Text className="text-red-500">{error}</Text>
-           )}
-         </View>
-   
-         {/* Password Input */}
          <View className="flex-row items-center border-b border-gray-400 w-full px-2 py-2">
            <FontAwesome5Icon name="lock" size={24} color="white" />
            <TextInput
@@ -78,11 +35,38 @@ const NewPassword = ({ name,
            )}
          </View>
    
+        
+   
+         {/* Password Input */}
+         <View className="flex-row items-center border-b border-gray-400 w-full px-2 py-2">
+           <FontAwesome5Icon name="lock" size={24} color="white" />
+           <TextInput
+             className="flex-1 px-2 text-[16px] text-white"
+             placeholder="Password"
+             placeholderTextColor="gray"
+             secureTextEntry={secureText}
+             value={prePassword}
+             onChangeText={(text) => setPrePassword(text)}
+           />
+           <TouchableOpacity onPress={() => setSecureText(!secureText)}>
+             {secureText ? (
+               <FontAwesome5Icon name="eye" size={24} color="white" />
+             ) : (
+               <FontAwesome5Icon name="eye-slash" size={24} color="white" />
+             )}
+           </TouchableOpacity>
+         </View>
+         <View className="min-h-[20px]">
+           {error.includes("Parol") && (
+             <Text className="text-red-500">{error}</Text>
+           )}
+         </View>
+   
          <TouchableOpacity onPress={() => navigation.navigate("Forgot")}>
            <Text className="text-red-500 text-right mt-2">Forget Password?</Text>
          </TouchableOpacity>
    
-         <TouchableOpacity onPress={register}>
+         <TouchableOpacity onPress={resetPassword}>
            <View className="flex-row justify-center items-center mt-6 bg-red-600 rounded-[12px] h-[50px]">
              <Text className="text-white text-xl">Ro'yxatdan o'tish</Text>
            </View>
