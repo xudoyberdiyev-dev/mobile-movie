@@ -15,7 +15,7 @@ export const RegisterFrom = ({
   navigation,
 }) => {
   return (
-    <View className="flex-1 p-8 w-full mt-[70px]">
+    <View className="flex-1 p-8 w-full mt-[45px]">
       {/* Title */}
       <Text className="text-white text-[34px] font-bold">Sign In</Text>
       <Text className="text-gray-400 text-[16px] mt-2">

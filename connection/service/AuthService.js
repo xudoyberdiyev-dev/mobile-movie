@@ -8,12 +8,13 @@ import { APP_API } from "../AppApi";
 export const sendToEmail = async (email) => {
     try {
         const { data } = await axios.post(`${BASE_URL}/auth/send-to`, null, { params: { email } });
-        await AsyncStorage.setItem("user_id", String(data.data.message)); // ❌ Xato: `data.data.message` noto‘g‘ri bo‘lishi mumkin
+        await AsyncStorage.setItem("user_id", String(data.message)); // ❌ Xato: `data.data.message` noto‘g‘ri bo‘lishi mumkin
         return data;
     } catch (error) {
         throw new Error(error.response?.data?.message || "Internet yoki server muammosi");
     }
 };
+
 
 export const verifyEmail = async (email, code) => {
     try {

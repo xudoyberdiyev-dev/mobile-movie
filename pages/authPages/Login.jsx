@@ -49,7 +49,7 @@ export const Login = ({ navigation }) => {
     
 
     return (
-        <View className="flex-1 bg-neutral-900">
+        <View className="flex-1">
         <ImageBackground 
             source={require('../../assets/backronimg.jpg')} 
             className="flex-1"

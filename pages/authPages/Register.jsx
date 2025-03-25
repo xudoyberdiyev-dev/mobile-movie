@@ -113,7 +113,7 @@ export const Register = ({ navigation }) => {
                 )}
             </SafeAreaView>
             
-            <SafeAreaView className="absolute top-[200px] p-5 w-full">
+            <SafeAreaView className="absolute top-[150px] p-5 w-full">
                 {step == 2 && (
                     <OtpStep 
                         otp={otp} 

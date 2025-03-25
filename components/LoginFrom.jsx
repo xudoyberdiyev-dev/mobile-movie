@@ -3,7 +3,7 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 export const LoginFrom = ({ email, setEmail, password, setPassword, error, navigation, secureText, setSecureText, handleLogin }) => {
     return (
-        <View className="flex-1 p-8 w-full mt-[70px]">
+        <View className="flex-1 p-8 w-full mt-[45px]">
             <Text className="text-white text-[34px] font-bold">Sign In</Text>
             <Text className="text-gray-400 text-[16px] mt-2">
                 Sign in to your account below

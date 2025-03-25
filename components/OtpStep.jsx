@@ -8,7 +8,7 @@ export const OtpStep = ({ navigation, otp, error, inputRefs, handleChange, handl
       {/* Back Button */}
         <TouchableOpacity 
             onPress={() => navigation.replace("Register")}
-            className="absolute top-[-190px] left-2 p-3 rounded-full bg-gray-800">
+            className="absolute top-[-120px] left-2 p-3 rounded-full bg-gray-800">
             <ArrowLeft size={24} color="white" />
         </TouchableOpacity>
       {/* Title */}
