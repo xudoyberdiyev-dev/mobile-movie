@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { Alert } from "react-native";
 import { APP_API } from "../AppApi";
+import { cache } from "react";
 
 export const sendToEmail = async (email) => {
     try {
@@ -21,8 +22,8 @@ export const verifyEmail = async (email, code) => {
         const { data } = await axios.post(`${BASE_URL}/auth/verify`, null, { params: { email, code } });
 
         if (data && data.message) {
-            await AsyncStorage.setItem("user_id", data.data.message); // ✅ ID to‘g‘ri joydan olinadi
-            console.log("User ID saqlandi:", data.data.message);
+            await AsyncStorage.setItem("user_id", data.message); // ✅ ID to‘g‘ri joydan olinadi
+            console.log("User ID saqlandi:", data.message);
             return data;
         }   
     } catch (error) {
@@ -67,6 +68,41 @@ export const loginUser = async (email, password) => {
         Toast.show({ type: "error", text1: "Xatolik", text2: "Email yoki parol xato" });
     }
 };
+
+export const sendVerifyEmail=async(email)=>{
+    try{
+        const {data}= await axios.post(`${BASE_URL}${APP_API.verifyEmail}`,null,{params:{email}})
+        if(data.success){
+            await AsyncStorage.setItem("reset_email",email) //email AsyncStorage saqlandi 
+        }
+        return data;
+    }catch(error){
+        console.log("Veifiy email"+error)
+    }
+}
+
+export const sendVerifyPassword =async(code,email)=>{
+    try{
+        const {data} =await axios.post(`${BASE_URL}${APP_API.verifyCode}`,null,{params:{code,email}})
+        if (data.success) {
+            await AsyncStorage.setItem('user_id',data.message)
+        }
+        return data;
+    }catch(error){
+        console.log(error)   
+    }
+}
+
+export const sendResetPassword=async(password)=>{
+    try{
+        const userId =await AsyncStorage.getItem('user_id')
+        const {data} =await axios.post(`${BASE_URL}${APP_API.resetPassword}/${userId}`,null,{params:{password}})
+        return data;
+    }catch(error){
+        console.log("reset password error"+error);
+    }
+}
+
 
 export const getUser = async (userId, token, setUserData, setLoading) => {
     setLoading(true);

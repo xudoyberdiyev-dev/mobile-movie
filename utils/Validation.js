@@ -25,3 +25,9 @@ export const validateLogin=(email,password)=>{
     if(!password.trim()) return "Iltimos passwordni kiritng"
     return ""
 }
+
+export const validatePassword=(password,prePassword)=>{
+    if(!password.trim()||!prePassword.trim()) return "Malumot bush qolib ketti"
+    if(password.length<6) return "Parol 6 ta belgidan ko'p bo'lsin"
+    if(password!==prePassword) return "Parol va tasdiqlash paroli bir xil bolsin"   
+}
