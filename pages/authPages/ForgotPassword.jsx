@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import { ImageBackground, SafeAreaView, View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-toast-message';
 
 import { ForgotEmail } from '../../components/EmailStep';
@@ -10,6 +9,7 @@ import { NewPassword } from '../../components/NewPassword';
 import { validateEmail, validateOtp, validatePassword } from '../../utils/Validation';
 import { sendResetPassword, sendVerifyEmail, sendVerifyPassword } from '../../connection/service/AuthService';
 import { handleChange, handleKeyPress } from '../../utils/Halpers';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const OTP_LENGTH = 6;
 
@@ -34,7 +34,7 @@ const ForgotPassword = ({ navigation }) => {
 
     try {
       const res = await sendVerifyEmail(email);
-      if (res?.success) {
+      if (res.success) {
         Toast.show({ type: 'success', text1: 'Qabul qilindi', text2: 'Kiritgan emailingizga kod yubordik' });
         setStep(2);
       } else {
@@ -59,9 +59,10 @@ const ForgotPassword = ({ navigation }) => {
       const data = await sendVerifyPassword(code, email);
       if (data?.success) {
         setStep(3);
-      } else {
+    } else {
         setError(data?.message || "Kod noto‘g‘ri, qayta urinib ko‘ring");
-      }
+    }
+    
     } catch (error) {
       setError("Server bilan aloqa qilishda xatolik yuz berdi");
     }
@@ -101,7 +102,7 @@ const ForgotPassword = ({ navigation }) => {
       />
 
       <SafeAreaView className="flex-1 absolute p-5 w-full">
-        {step === 1 && <ForgotEmail email={email} setEmail={setEmail} error={error} verifyEmail={verifyEmail} />}
+        {step === 1 && <ForgotEmail email={email} navigation={navigation} setEmail={setEmail} error={error} verifyEmail={verifyEmail} />}
         {step === 3 && (
           <NewPassword
             password={password}
@@ -110,7 +111,7 @@ const ForgotPassword = ({ navigation }) => {
             setPrePassword={setPrePassword}
             secureText={secureText}
             setSecureText={setSecureText}
-            resetPassword={resetPassword}
+            resetPassword={resetPassword} navigation={navigation}
           />
         )}
       </SafeAreaView>
