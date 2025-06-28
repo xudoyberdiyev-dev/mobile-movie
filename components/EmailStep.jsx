@@ -11,10 +11,10 @@ export const EmailStep =({email,setEmail,error,sendEmail,navigation})=>{
                         </Text>
                 
                         {/* Email Input */}
-                        <View className="flex-row  items-center border-b border-gray-400 w-full mt-5 px-2 py-2">
+                        <View className="flex-row items-center border-b border-gray-400 w-full mt-5 px-2 py-1">
                             <FontAwesome5Icon name="envelope" size={24} color="white" />
                             <TextInput
-                            className="flex-1 px-2 text-[16px] text-white"
+                            className="flex-1 text-[16px] h-10 text-white px-2"
                             placeholder="Email"
                             placeholderTextColor="gray"
                             value={email}

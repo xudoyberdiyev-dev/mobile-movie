@@ -3,51 +3,81 @@ import { BASE_URL } from "../BaseUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { APP_API } from "../AppApi";
+import { Alert } from "react-native";
 
 /** Emailga kod yuborish */
 export const sendToEmail = async (email) => {
     try {
         const { data } = await axios.post(`${BASE_URL}/auth/send-to`, null, { params: { email } });
-        if (data?.userId) {
-            await AsyncStorage.setItem("user_id", String(data.user?.id));
+
+        // StatusCode 409 bo'lsa, email ro'yxatdan o'tganini bildiradi
+        if (data?.statusCode === 409) {
+            return { success: false, message: data?.message || "Bu email allaqachon ro'yxatdan o'tgan", statusCode: 409 };
         }
-        return data;
+
+        return data; // Kod yuborilganini bildirgan javob
     } catch (error) {
         throw new Error(error.response?.data?.message || "Internet yoki server muammosi");
     }
 };
-
 /** Kodni tasdiqlash */
-export const verifyEmail = async (email, code) => {
+export const verifyEmail = async (code,email) => {
     try {
-        const { data } = await axios.post(`${BASE_URL}/auth/verify`, null, { params: { email, code } });
+        // Backendga so'rov yuborish
+        const response = await axios.post(`${BASE_URL}/auth/verify`, null, {
+            params: {code,email },
+        });
 
-        if (data?.userId) {
-            await AsyncStorage.setItem("user_id", String(data.user?.id));
-            return data;
+        // Backend javobini tekshirish
+        if (response.data.success) {
+            // Javob muvaffaqiyatli bo'lsa, keyingi qadamni bajarish
+            Alert.alert('Muvaffaqiyat', 'Verifikatsiya muvaffaqiyatli yakunlandi!');
+            await AsyncStorage.setItem("user_id", response.data.message);  // `response.data.message` dan saqlash
+        } else {
+            // Kod noto'g'ri bo'lsa
+            Alert.alert('Xatolik', 'Kod noto‘g‘ri, qayta urinib ko‘ring');
         }
     } catch (error) {
-        console.log("Kod noto‘g‘ri, qayta urinib ko‘ring:", error.response?.data?.message);
+        // Xatolik yuzaga kelgan bo'lsa
+        console.error(error);
+        Alert.alert('Xatolik', error.response?.data?.message || 'Server xatoligi');
     }
 };
 
 /** Ro‘yxatdan o‘tish */
-export const registerUser = async (data, navigation) => {
-    const userId = await AsyncStorage.getItem("user_id");
-    console.log("📌 Saqlangan user_id:", userId);
-
+export const registerUser = async (codeId, name, lastName, password) => {
     try {
-        const response = await axios.post(`${BASE_URL}${APP_API.register}`, { ...data, code_id: userId });
+        // Backendga so'rov yuborish
+        const response = await axios.post(
+            `${BASE_URL}/register`,
+            {
+                name,
+                lastName,
+                password
+            },
+            {
+                params: { code_id: codeId } // Query param sifatida ID yuboriladi
+            }
+        );
 
-        if (response.data?.success) {
-            await AsyncStorage.removeItem("user_id");
-            navigation.navigate("Person");
+        // Javob muvaffaqiyatli bo'lsa
+        if (response.data.success) {
+            Alert.alert("Muvaffaqiyat", "Ro‘yxatdan o‘tish muvaffaqiyatli yakunlandi!");
+
+            // User ID yoki boshqa ma'lumotlarni saqlash
+            await AsyncStorage.setItem("user_id", codeId);
+
+            return response.data;
+        } else {
+            Alert.alert("Xatolik", response.data.message);
+            return null;
         }
     } catch (error) {
-        console.log("❌ Ro‘yxatdan o‘tishda xatolik:", error.response?.data?.message);
+        console.error(error);
+        Alert.alert("Xatolik", error.response?.data?.message || "Server xatoligi");
+        return null;
     }
 };
-
 /** Tizimga kirish */
 export const loginUser = async (email, password) => {
   try {

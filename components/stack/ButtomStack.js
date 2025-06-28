@@ -13,40 +13,37 @@ const Tab = createBottomTabNavigator();
 const BottomStack = () => {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          if (route.name === "Home") {
-            iconName = "home";
-          } else if (route.name === "Search") {
-            iconName = "search";
-          } else if (route.name === "My List") {
-            iconName = "list";
-          } else if (route.name === "Notification") {
-            iconName = "bell";
-          } else if (route.name === "Profile") {
-            iconName = "user";
-          }
-
-          return (
-            <Animated.View style={{ opacity: focused ? 1 : 0.5 }}>
-              <Icon name={iconName} size={size} color={color} />
-            </Animated.View>
-          );
-        },
-        tabBarActiveTintColor: "red",
-        tabBarInactiveTintColor: "white",
-        tabBarStyle: { backgroundColor: "black", paddingBottom: 5, height: 60 },
-        tabBarLabelStyle: { fontSize: 12 },
-        headerShown: false,
-      })}
-    >
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Search" component={Search} />
-      <Tab.Screen name="My List" component={MyList} />
-      <Tab.Screen name="Notification" component={Notification} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
-    </Tab.Navigator>
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused, color, size }) => {
+        let iconName;
+        if (route.name === "Home") iconName = "home";
+        else if (route.name === "Search") iconName = "search";
+        else if (route.name === "My List") iconName = "list";
+        else if (route.name === "Notification") iconName = "bell";
+        else if (route.name === "Profile") iconName = "user";
+  
+        return <Icon name={iconName} size={size} color={color} />;
+      },
+      tabBarActiveTintColor: "red",
+      tabBarInactiveTintColor: "white",
+      tabBarStyle: {
+        backgroundColor: "black",
+        height: 60,
+        position: "absolute", // ✅ Shunday qiling
+        bottom: 0, // ✅ Pastga yopishtirish
+      },
+      tabBarLabelStyle: { fontSize: 12 },
+      headerShown: false,
+      keyboardHidesTabBar: false, // ✅ Klaviatura ochilganda yashirinmasligi uchun
+    })}
+  >
+    <Tab.Screen name="Home" component={Home} />
+    <Tab.Screen name="Search" component={Search} />
+    <Tab.Screen name="My List" component={MyList} />
+    <Tab.Screen name="Notification" component={Notification} />
+    <Tab.Screen name="Profile" component={ProfileStack} />
+  </Tab.Navigator>
+  
   );
 };
 

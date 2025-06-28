@@ -6,9 +6,9 @@ export const validateEmail = (email) => {
     return "";
 };
 
-export const validateRegister = (name, surname, password) => {
+export const validateRegister = (name, lasName, password) => {
     if (!name.trim()) return "Ismingiz bo'sh qolib ketti";
-    if (!surname.trim()) return "Familyangiz bo'sh qolib ketti";
+    if (!lasName.trim()) return "Familyangiz bo'sh qolib ketti";
     if (!password.trim()) return "Parol bo'sh qolib ketdi";
     if (password.length < 6) return "Parol 6 ta belgidan ko'p bo'lsin";
     return "";

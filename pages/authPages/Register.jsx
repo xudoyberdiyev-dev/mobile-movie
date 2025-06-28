@@ -1,7 +1,7 @@
 import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useState } from "react";
-import { Alert, ImageBackground, SafeAreaView, View } from "react-native";
+import { Alert, ImageBackground, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, TouchableWithoutFeedback, View } from "react-native";
 import { BASE_URL } from "../../connection/BaseUrl";
 import { APP_API } from "../../connection/AppApi";
 import Toast from "react-native-toast-message";
@@ -11,6 +11,7 @@ import { OtpStep } from "../../components/OtpStep";
 import { validateEmail, validateOtp, validateRegister } from "../../utils/Validation";
 import { registerUser, sendToEmail, verifyEmail } from "../../connection/service/AuthService";
 import { handleChange, handleKeyPress } from "../../utils/Halpers";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const OTP_LENGTH = 6;
 
@@ -25,14 +26,7 @@ export const Register = ({ navigation }) => {
     const inputRefs = useRef([]);
     const [secureText, setSecureText] = useState(true); // Parol ko‘rinishi
 
-    const register =async()=>{
-        const data ={name,surname,password}
-        try{
-            await registerUser(data,navigation)
-        }catch(error){
-            console.log("Registerda xatolik"+error)
-        }
-    }
+    
     const sendEmail = async () => {
         const errorMessage = validateEmail(email);
         if (errorMessage) {
@@ -40,42 +34,76 @@ export const Register = ({ navigation }) => {
             return;
         }
         setError("");
-
+    
         try {
-            const data = await sendToEmail(email);
-            if (data.success) {
-                setStep(2);
-                Toast.show({type:"success",text1:'Xabar yuborildi',text2:"Emailingizga kod yubordik"})
+            const res = await sendToEmail(email);
+    
+            // Agar backenddan muvaffaqiyatli javob kelsa (statusCode 200 yoki 202)
+            if (res?.success && res?.statusCode === 200) {
+                Toast.show({type: "success", text1: 'Xabar yuborildi', text2: "Emailingizga kod yubordik"});
+                setStep(2); // Kod yuborish sahifasiga o'tish
+            } else if (res?.statusCode === 409) {
+                // Email allaqachon ro'yxatdan o'tgan bo'lsa
+                Alert.alert("Xatolik", "Bu email orqali avval ro'yhatdan o'tilgan");
             } else {
-                Alert.alert("Xatolik", data.message);
+                // Boshqa xatolik holatlari
+
+                Alert.alert("Xatolik", res?.message || "Noto‘g‘ri email yoki boshqa xatolik");
             }
         } catch (error) {
-            Alert.alert("Xatolik", error.message);
+            Alert.alert("Xatolik", error.message || "Server xatoligi");
         }
     };
+    
+    
 
     const verifyOtp = async () => {
-        const code = otp.join("");
-        const errorMessage = validateOtp(code);
+        const code = otp.join("");  // Otp kodni qo'shish
+        const errorMessage = validateOtp(code);  // Kodni tekshirish
         if (errorMessage) {
-            setError(errorMessage);
+            setError(errorMessage);  // Agar xatolik bo'lsa, uni ko'rsatish
             return;
         }
         setError("");
-
+    
         try {
-            const data = await verifyEmail(email, code);
-            if (data.success) {
-                setStep(3);
+            const data = await verifyEmail(code,email);  // Email va kodni yuborish
+            if (data?.success||data.statusCode===200) {
+                setStep(3);  // Muvaffaqiyatli bo'lsa, keyingi qadamga o'tish
             } else {
                 setError("Kod noto‘g‘ri, qayta urinib ko‘ring");
             }
         } catch (error) {
-            setError(error.message);
+            setError(error.message);  // Xatolik yuzaga kelsa, uni ko'rsatish
         }
     };
 
+    const register =async()=>{
+        const errorMessage =validateRegister(name,lastName,password)
+        if(errorMessage){
+            setError(errorMessage)
+            return
+        }
+        setError('')
+        const data ={name,surname,password}
+        const codeId=await AsyncStorage.getItem("user_id")
+        try{
+            const res =await registerUser(codeId,data)
+            if(res){
+                console.log("User royxatdan otti")
+            }
+        }catch(error){
+            console.log("Registerda xatolik"+error)
+        }
+    }
+    
+
     return (
+        <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className='flex-1 bg-neutral-900'>
             <ImageBackground source={require('../../assets/backronimg.jpg')} className='flex-1' />
             <LinearGradient 
@@ -85,8 +113,9 @@ export const Register = ({ navigation }) => {
                 locations={[0, 0.65]}
                 className='top-0 absolute left-0 right-0 bottom-0'
             />
-            
-            <SafeAreaView className="flex-1 absolute p-5 w-full">
+             
+
+            <ScrollView className="flex-1 absolute p-5 w-full" keyboardShouldPersistTaps="handled">
                 {step == 1 && (
                     <EmailStep 
                         email={email} 
@@ -111,7 +140,7 @@ export const Register = ({ navigation }) => {
                         navigation={navigation} 
                     />
                 )}
-            </SafeAreaView>
+            </ScrollView>
             
             <SafeAreaView className="absolute top-[150px] p-5 w-full">
                 {step == 2 && (
@@ -127,5 +156,9 @@ export const Register = ({ navigation }) => {
                 )}
             </SafeAreaView>
         </View>
+
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+       
     );
 };
